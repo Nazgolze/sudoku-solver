@@ -6,6 +6,19 @@
 #include <stdbool.h>
 #include "sudoku.h"
 
+enum moves_t {
+	ZERO = 0x0,
+	ONE = 0x1,
+	TWO = 0x2,
+	THREE = 0x4,
+	FOUR = 0x8,
+	FIVE = 0x10,
+	SIX = 0x20,
+	SEVEN = 0x40,
+	EIGHT = 0x80,
+	NINE = 0x100,
+};
+
 static uint8_t elements[9][9] = {
 		{0, 0, 3, 0, 0, 8, 9, 0, 0},
 		{0, 0, 0, 9, 0, 0, 6, 0, 0},
@@ -17,6 +30,9 @@ static uint8_t elements[9][9] = {
 		{0, 0, 4, 0, 0, 3, 0, 0, 0},
 		{0, 0, 9, 1, 0, 0, 3, 0, 0}
 };
+
+static const uint16_t masks[]
+	= {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};
 
 void sudoku_puzzle_print(struct sudoku_puzzle *sp)
 {
@@ -52,19 +68,6 @@ void _go_to_next(struct sudoku_puzzle *sp)
 		}
 	}
 }
-
-enum moves_t {
-	ZERO = 0x0,
-	ONE = 0x1,
-	TWO = 0x2,
-	THREE = 0x4,
-	FOUR = 0x8,
-	FIVE = 0x10,
-	SIX = 0x20,
-	SEVEN = 0x40,
-	EIGHT = 0x80,
-	NINE = 0x100,
-};
 
 uint16_t _get_val(uint16_t val)
 {
@@ -131,8 +134,6 @@ struct sudoku_puzzle *_sudoku_puzzle_solve_bt(struct sudoku_puzzle sp)
 	uint16_t moves = _get_possible_moves(&sp);
 	uint8_t tmp = 0;
 	struct sudoku_puzzle *solution = NULL;
-	const uint16_t masks[]
-		= {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};
 	int idx, jdx;
 
 #ifdef DEBUG
