@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <getopt.h>
 #include "sudoku.h"
 
 enum moves_t {
@@ -22,8 +23,17 @@ enum moves_t {
 static const uint16_t masks[]
 	= {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};
 
+static struct option _long_options[] = {
+	{"help", no_argument, 0, 'h'},
+	{0, 0, 0, 0}
+};
+
 void sudoku_puzzle_print(struct sudoku_puzzle *sp)
 {
+	if(!sp) {
+		printf("no solution\n");
+		return;
+	}
 	int row, column;
 	for(row = 0; row < 9; row++) {
 		printf("[");
@@ -170,9 +180,8 @@ struct sudoku_puzzle *sudoku_puzzle_solve(struct sudoku_puzzle *sp)
 static void _sudoku_puzzle_load(struct sudoku_puzzle *sp)
 {
 	char buf[1024] = {0};
-	size_t bytes_read;
 
-	bytes_read = fread(&buf, 1, sizeof(buf), stdin);
+	fread(&buf, 1, sizeof(buf), stdin);
 
 	int idx, jdx, count;
 	idx = jdx = count = 0;
@@ -204,10 +213,31 @@ static void _sudoku_puzzle_load(struct sudoku_puzzle *sp)
 	}
 }
 
+static void _print_help(void)
+{
+	printf("Usage: sudoku [OPTION]...\n"
+	       "Print solved sudoku puzzle for a given sudoku puzzle from stdin\n\n"
+	       "  -h, --help\tdisplay this help and exit\n");
+}
+
 int main(int argc, char **argv)
 {
 	struct sudoku_puzzle sp = {0};
 	struct sudoku_puzzle *solution;
+
+	int c;
+	while(true) {
+		int option_index = 0;
+		c = getopt_long(argc, argv, "h", _long_options, &option_index);
+
+		if(c == -1)
+			break;
+		switch(c) {
+		case 'h':
+			_print_help();
+			return 0;
+		}
+	}
 
 	_sudoku_puzzle_load(&sp);
 
