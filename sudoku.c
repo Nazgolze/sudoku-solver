@@ -19,18 +19,6 @@ enum moves_t {
 	NINE = 0x100,
 };
 
-static uint8_t elements[9][9] = {
-		{0, 0, 3, 0, 0, 8, 9, 0, 0},
-		{0, 0, 0, 9, 0, 0, 6, 0, 0},
-		{0, 0, 8, 5, 0, 4, 0, 3, 0},
-		{8, 0, 2, 0, 0, 0, 0, 0, 0},
-		{0, 1, 0, 3, 0, 7, 0, 8, 0},
-		{0, 0, 0, 0, 0, 0, 4, 0, 6},
-		{0, 6, 0, 4, 0, 5, 1, 0, 0},
-		{0, 0, 4, 0, 0, 3, 0, 0, 0},
-		{0, 0, 9, 1, 0, 0, 3, 0, 0}
-};
-
 static const uint16_t masks[]
 	= {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};
 
@@ -50,7 +38,7 @@ void sudoku_puzzle_print(struct sudoku_puzzle *sp)
 	}
 }
 
-void _go_to_next(struct sudoku_puzzle *sp)
+static void _go_to_next(struct sudoku_puzzle *sp)
 {
 	int idx, jdx;
 	for(idx = sp->x; idx < 9; idx++) {
@@ -69,7 +57,7 @@ void _go_to_next(struct sudoku_puzzle *sp)
 	}
 }
 
-uint16_t _get_val(uint16_t val)
+static uint16_t _get_val(uint16_t val)
 {
 	switch(val) {
 	case 1:
@@ -95,7 +83,7 @@ uint16_t _get_val(uint16_t val)
 	}
 }
 
-uint16_t _get_possible_moves(struct sudoku_puzzle *sp)
+static uint16_t _get_possible_moves(struct sudoku_puzzle *sp)
 {
 	uint16_t ret = 0;
 
@@ -128,7 +116,7 @@ uint16_t _get_possible_moves(struct sudoku_puzzle *sp)
 	return ret;
 }
 
-struct sudoku_puzzle *_sudoku_puzzle_solve_bt(struct sudoku_puzzle sp)
+static struct sudoku_puzzle *_sudoku_puzzle_solve_bt(struct sudoku_puzzle sp)
 {
 	_go_to_next(&sp);
 	uint16_t moves = _get_possible_moves(&sp);
@@ -179,12 +167,49 @@ struct sudoku_puzzle *sudoku_puzzle_solve(struct sudoku_puzzle *sp)
 	return _sudoku_puzzle_solve_bt(*sp);
 }
 
+static void _sudoku_puzzle_load(struct sudoku_puzzle *sp)
+{
+	char buf[1024] = {0};
+	size_t bytes_read;
+
+	bytes_read = fread(&buf, 1, sizeof(buf), stdin);
+
+	int idx, jdx, count;
+	idx = jdx = count = 0;
+
+	while(buf[count]) {
+		if(idx > 8)
+			break;
+		if(jdx > 8) {
+			idx++;
+			jdx = 0;
+			count++;
+			continue;
+		}
+		if(buf[count] < '0' && buf[count] > '9' && buf[count] != '_') {
+			count++;
+			continue;
+		}
+		if((buf[count] >= '0' && buf[count] <= '9') || buf[count] == '_') {
+			if(buf[count] == '_') {
+				sp->element[idx][jdx] = 0;
+			} else {
+				sp->element[idx][jdx] = buf[count] - '0';
+			}
+			jdx++;
+			count++;
+			continue;
+		}
+		count++;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	struct sudoku_puzzle sp = {0};
 	struct sudoku_puzzle *solution;
 
-	memcpy(&sp.element, elements, sizeof(sp.element));
+	_sudoku_puzzle_load(&sp);
 
 	printf("original:\n");
 	sudoku_puzzle_print(&sp);
