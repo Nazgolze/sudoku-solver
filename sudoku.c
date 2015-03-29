@@ -20,10 +20,12 @@ enum moves_t {
 	NINE = 0x100,
 };
 
+static bool _show_intermediate = false;
 static const uint16_t masks[]
 	= {ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};
 
 static struct option _long_options[] = {
+	{"intermediate", no_argument, 0, 'i'},
 	{"help", no_argument, 0, 'h'},
 	{0, 0, 0, 0}
 };
@@ -39,12 +41,14 @@ void sudoku_puzzle_print(struct sudoku_puzzle *sp)
 		printf("[");
 		for(column = 0; column < 9; column++) {
 			if(sp->element[row][column] == 0) {
-				printf("_ ");
+				printf("_");
 			} else {
-				printf("%"PRIu16" ", sp->element[row][column]);
+				printf("%"PRIu16"", sp->element[row][column]);
 			}
+			if(column < 8) 
+				printf(" ");
 		}
-		printf("\b]\n");
+		printf("]\n");
 	}
 }
 
@@ -134,11 +138,11 @@ static struct sudoku_puzzle *_sudoku_puzzle_solve_bt(struct sudoku_puzzle sp)
 	struct sudoku_puzzle *solution = NULL;
 	int idx, jdx;
 
-#ifdef DEBUG
-	printf("intermediate:\n");
-	sudoku_puzzle_print(&sp);
-	printf("====================\n");
-#endif
+	if(_show_intermediate) {
+		printf("intermediate:\n");
+		sudoku_puzzle_print(&sp);
+		printf("====================\n");
+	}
 
 	// base case
 	if(moves == 0) {
@@ -192,7 +196,6 @@ static void _sudoku_puzzle_load(struct sudoku_puzzle *sp)
 		if(jdx > 8) {
 			idx++;
 			jdx = 0;
-			count++;
 			continue;
 		}
 		if(buf[count] < '0' && buf[count] > '9' && buf[count] != '_') {
@@ -217,6 +220,7 @@ static void _print_help(void)
 {
 	printf("Usage: sudoku [OPTION]...\n"
 	       "Print solved sudoku puzzle for a given sudoku puzzle from stdin\n\n"
+	       "  -i, --intermediate\tshow intermediate results\n"
 	       "  -h, --help\tdisplay this help and exit\n");
 }
 
@@ -228,7 +232,7 @@ int main(int argc, char **argv)
 	int c;
 	while(true) {
 		int option_index = 0;
-		c = getopt_long(argc, argv, "h", _long_options, &option_index);
+		c = getopt_long(argc, argv, "hi", _long_options, &option_index);
 
 		if(c == -1)
 			break;
@@ -236,6 +240,9 @@ int main(int argc, char **argv)
 		case 'h':
 			_print_help();
 			return 0;
+		case 'i':
+			_show_intermediate = true;
+			break;
 		}
 	}
 
