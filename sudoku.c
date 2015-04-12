@@ -32,7 +32,7 @@ static struct option _long_options[] = {
 
 void sudoku_puzzle_print(struct sudoku_puzzle *sp)
 {
-	if(!sp) {
+	if(sp == NULL) {
 		printf("no solution\n");
 		return;
 	}
