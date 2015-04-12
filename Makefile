@@ -10,8 +10,11 @@ debug: sudoku.o Makefile
 prod: sudoku.o Makefile
 	$(CC) $(CFLAGS) $(INCFLAGS) $(LDFLAGS) -fPIC -o sudoku sudoku.o
 
+doc:
+	(doxygen)
+
 %.o: %.c Makefile
 	$(CC) $(CFLAGS) -fPIC $(INCFLAGS) -c $<
 
 clean:
-	(rm -f *.o sudoku)
+	(rm -rf *.o sudoku documentation)
