@@ -1,3 +1,9 @@
+/**
+ * @file sudoku.c
+ * @author Juan Gonzalez
+ * @brief main sudoku code
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -30,6 +36,11 @@ static struct option _long_options[] = {
 	{0, 0, 0, 0}
 };
 
+/**
+ * prints a sudoku puzzle
+ *
+ * @param sp a sudoku_puzzle struct pointer
+ */
 void sudoku_puzzle_print(struct sudoku_puzzle *sp)
 {
 	if(sp == NULL) {
@@ -45,13 +56,18 @@ void sudoku_puzzle_print(struct sudoku_puzzle *sp)
 			} else {
 				printf("%"PRIu16"", sp->element[row][column]);
 			}
-			if(column < 8) 
+			if(column < 8)
 				printf(" ");
 		}
 		printf("]\n");
 	}
 }
 
+/**
+ * advances the current element to the next zero element
+ *
+ * @param sp a sudoku_puzzle struct pointer
+ */
 static void _go_to_next(struct sudoku_puzzle *sp)
 {
 	int idx, jdx;
@@ -71,6 +87,12 @@ static void _go_to_next(struct sudoku_puzzle *sp)
 	}
 }
 
+/**
+ * given an integer 'val' between 0-9, return the mask for the 'val' bit
+ *
+ * @param val unsigned 16-bit integer
+ * @return unsigned 16-bit integer
+ */
 static uint16_t _get_val(uint16_t val)
 {
 	switch(val) {
@@ -97,6 +119,13 @@ static uint16_t _get_val(uint16_t val)
 	}
 }
 
+/**
+ * get the numbers that are valid for a puzzle's current position in
+ * the form of a bitmask
+ *
+ * @param sp a sudoku_puzzle struct pointer
+ * @return unsigned 16-bit integer
+ */
 static uint16_t _get_possible_moves(struct sudoku_puzzle *sp)
 {
 	uint16_t ret = 0;
@@ -130,6 +159,12 @@ static uint16_t _get_possible_moves(struct sudoku_puzzle *sp)
 	return ret;
 }
 
+/**
+ * solve the sudoku puzzle (recursive backtracking algorithm)
+ *
+ * @param sp a sudoku_puzzle struct
+ * @return a sudoku_puzzle struct pointer
+ */
 static struct sudoku_puzzle *_sudoku_puzzle_solve_bt(struct sudoku_puzzle sp)
 {
 	_go_to_next(&sp);
@@ -176,11 +211,22 @@ static struct sudoku_puzzle *_sudoku_puzzle_solve_bt(struct sudoku_puzzle sp)
 	return NULL;
 }
 
+/**
+ * solve the sudoku puzzle
+ *
+ * @param sp a sudoku_puzzle struct pointer
+ * @return a sudoku_puzzle struct pointer
+ */
 struct sudoku_puzzle *sudoku_puzzle_solve(struct sudoku_puzzle *sp)
 {
 	return _sudoku_puzzle_solve_bt(*sp);
 }
 
+/**
+ * load a sudoku puzzle from stdin
+ *
+ * @param sp a sudoku_puzzle struct pointer
+ */
 static void _sudoku_puzzle_load(struct sudoku_puzzle *sp)
 {
 	char buf[1024] = {0};
@@ -216,6 +262,9 @@ static void _sudoku_puzzle_load(struct sudoku_puzzle *sp)
 	}
 }
 
+/**
+ * print help
+ */
 static void _print_help(void)
 {
 	printf("Usage: sudoku [OPTION]...\n"
@@ -224,6 +273,12 @@ static void _print_help(void)
 	    "  -h, --help\tdisplay this help and exit\n");
 }
 
+/**
+ * main.
+ *
+ * @param argc an integer for number of args
+ * @param argv a char** for the args
+ */
 int main(int argc, char **argv)
 {
 	struct sudoku_puzzle sp = {0};
