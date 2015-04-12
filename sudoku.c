@@ -219,9 +219,9 @@ static void _sudoku_puzzle_load(struct sudoku_puzzle *sp)
 static void _print_help(void)
 {
 	printf("Usage: sudoku [OPTION]...\n"
-		"Print solved sudoku puzzle for a given sudoku puzzle from stdin\n\n"
-		"  -i, --intermediate\tshow intermediate results\n"
-		"  -h, --help\tdisplay this help and exit\n");
+	    "Print solved sudoku puzzle for a given sudoku puzzle from stdin\n\n"
+	    "  -i, --intermediate\tshow intermediate results\n"
+	    "  -h, --help\tdisplay this help and exit\n");
 }
 
 int main(int argc, char **argv)
