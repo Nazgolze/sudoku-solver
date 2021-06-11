@@ -1,0 +1,22 @@
+name: jtst
+version: 0.0.1
+summary: jtst
+description: |
+  jtst
+
+confinement: strict
+base: core18
+
+parts:
+  jtst:
+    plugin: nil
+    source: .
+    override-build: |
+      make
+      mv sudoku ../install/jtst
+    stage:
+      - jtst
+
+apps:
+  jtst:
+    command: jtst
