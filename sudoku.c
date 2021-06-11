@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <getopt.h>
 #include "sudoku.h"
+#include "version.h"
 
 enum moves_t {
 	ZERO = 0x0,
@@ -33,6 +34,7 @@ static const uint16_t masks[]
 static struct option _long_options[] = {
 	{"intermediate", no_argument, 0, 'i'},
 	{"help", no_argument, 0, 'h'},
+	{"version", no_argument, 0, 'v'},
 	{0, 0, 0, 0}
 };
 
@@ -274,6 +276,18 @@ static void _print_help(void)
 }
 
 /**
+ * print version
+ */
+static void _print_version(void)
+{
+	if(commit_id == NULL) {
+		printf("sudoku solver: version %s\n", version);
+	} else {
+		printf("sudoku solver: version %s-%s\n", version, commit_id);
+	}
+}
+
+/**
  * main.
  *
  * @param argc an integer for number of args
@@ -294,6 +308,9 @@ int main(int argc, char **argv)
 		switch(c) {
 		case 'h':
 			_print_help();
+			return 0;
+		case 'v':
+			_print_version();
 			return 0;
 		case 'i':
 			_show_intermediate = true;

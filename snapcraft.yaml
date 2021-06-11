@@ -12,6 +12,7 @@ parts:
     plugin: nil
     source: .
     override-build: |
+      sed -i "s/commit_id = NULL/commit_id = \"$(git rev-list HEAD | head -n 1 | tr -d [:space:])\"/" version.h
       make
       mv sudoku ../install/jtst
     stage:
